@@ -11,6 +11,7 @@ use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Storage;
 
 
+
 class EmployeeController extends Controller
 {
     /**
@@ -179,6 +180,7 @@ class EmployeeController extends Controller
     {
         $this->middleware('auth');
     }
+<<<<<<< HEAD
 
     public function downloadFile($employeeId)
     {
@@ -222,4 +224,6 @@ class EmployeeController extends Controller
         }
         return redirect()->route('employees.index');
     }
+=======
+>>>>>>> 7e2ee79b91abc65a5bf4d93e84014bde773cdc80
 }

@@ -37,6 +37,7 @@ Route::resource('barang', BarangController::class);
 Auth::routes();
 
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
+<<<<<<< HEAD
 
 
 Route::get('/local-disk', function () {
@@ -124,3 +125,5 @@ Route::get('download-file/{employeeId}', [
 
 Route::delete('delete-file/{employeeId}', [EmployeeController::class, 'deleteFile'])
     ->name('employees.deleteFile');
+=======
+>>>>>>> 7e2ee79b91abc65a5bf4d93e84014bde773cdc80

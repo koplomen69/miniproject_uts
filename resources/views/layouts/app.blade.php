@@ -20,6 +20,10 @@
     @include('layouts.nav')
 
     <main class="py-4">
+<<<<<<< HEAD
         
+=======
+        @yield('content')
+>>>>>>> 7e2ee79b91abc65a5bf4d93e84014bde773cdc80
 </body>
 </html>
