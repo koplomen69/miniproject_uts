@@ -82,6 +82,13 @@
                                                 class="btn btn-outline-dark btn-sm me-2"><i
                                                     class="bi-trash"></i></button>
                                         </form>
+                                        <form action="{{ route('employees.deleteFile', ['employeeId' => $employee->id]) }}" method="POST">
+                                            @csrf
+                                            @method('delete')
+
+                                            <!-- Tombol untuk menghapus file -->
+                                            <button type="submit" onclick="return confirm('Are you sure you want to delete this CV file?')">Delete CV File</button>
+                                        </form>
                                     </div>
                                 </div>
 

@@ -7,6 +7,9 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\DB;
 use App\Models\Employee;
 use App\Models\Position;
+use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Storage;
+
 
 class EmployeeController extends Controller
 {
@@ -66,6 +69,14 @@ class EmployeeController extends Controller
         if ($validator->fails()) {
             return redirect()->back()->withErrors($validator)->withInput();
         }
+        // Get File
+        $file = $request->file('cv');
+        if ($file != null) {
+            $originalFilename = $file->getClientOriginalName();
+            $encryptedFilename = $file->hashName();
+            // Store File
+            $file->store('public/files');
+        }
         // ELOQUENT
         $employee = new Employee;
         $employee->firstname = $request->firstName;
@@ -73,6 +84,10 @@ class EmployeeController extends Controller
         $employee->email = $request->email;
         $employee->age = $request->age;
         $employee->position_id = $request->position;
+        if ($file != null) {
+            $employee->original_filename = $originalFilename;
+            $employee->encrypted_filename = $encryptedFilename;
+        }
         $employee->save();
         return redirect()->route('employees.index');
     }
@@ -115,7 +130,7 @@ class EmployeeController extends Controller
         $positions = Position::all();
         $employee = Employee::find($id);
 
-        return view('employee.edit', compact('pageTitle', 'employee'));
+        return view('employee.edit', compact('pageTitle', 'employee', 'positions'));
     }
 
 
@@ -157,6 +172,54 @@ class EmployeeController extends Controller
     {
         // ELOQUENT
         Employee::find($id)->delete();
+        return redirect()->route('employees.index');
+    }
+
+    public function __construct()
+    {
+        $this->middleware('auth');
+    }
+
+    public function downloadFile($employeeId)
+    {
+        $employee = Employee::find($employeeId);
+        $encryptedFilename = 'public/files/' . $employee->encrypted_filename;
+        $downloadFilename =
+            Str::lower($employee->firstname . '_' . $employee->lastname . '_cv.pdf');
+        if (Storage::exists($encryptedFilename)) {
+            return Storage::download($encryptedFilename, $downloadFilename);
+        }
+    }
+
+    public function deleteFile($employeeId)
+    {
+        // Temukan data karyawan berdasarkan ID
+        $employee = Employee::find($employeeId);
+
+        // Pastikan karyawan ditemukan
+        if ($employee) {
+            // Buat nama file yang akan dihapus
+            $filename = 'public/files/' . $employee->encrypted_filename;
+
+            // Periksa apakah file ada dalam penyimpanan
+            if (Storage::exists($filename)) {
+                // Hapus file dari penyimpanan
+                Storage::delete($filename);
+
+                // Update kolom original_filename menjadi null (opsional, tergantung kebutuhan)
+                $employee->original_filename = null;
+                $employee->save();
+
+                // Berikan pesan sukses atau tindakan lanjutan sesuai kebutuhan
+                return redirect()->back()->with('success', 'File berhasil dihapus.');
+            } else {
+                // Jika file tidak ditemukan, berikan pesan error atau tindakan lanjutan sesuai kebutuhan
+                return redirect()->back()->with('error', 'File tidak ditemukan.');
+            }
+        } else {
+            // Jika karyawan tidak ditemukan, berikan pesan error atau tindakan lanjutan sesuai kebutuhan
+            return redirect()->back()->with('error', 'Karyawan tidak ditemukan.');
+        }
         return redirect()->route('employees.index');
     }
 }
