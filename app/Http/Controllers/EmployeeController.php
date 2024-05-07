@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\DB;
 use App\Models\Employee;
 use App\Models\Position;
 
+
 class EmployeeController extends Controller
 {
     /**
@@ -158,5 +159,10 @@ class EmployeeController extends Controller
         // ELOQUENT
         Employee::find($id)->delete();
         return redirect()->route('employees.index');
+    }
+
+    public function __construct()
+    {
+        $this->middleware('auth');
     }
 }
